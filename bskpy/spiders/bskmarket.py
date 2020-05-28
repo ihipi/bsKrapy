@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import re
+import json
 from scrapy import Request
 from scrapy.loader import ItemLoader
 
@@ -14,10 +15,16 @@ class BskmarketSpider(scrapy.Spider):
     titleCellsClass = "subject lockedbg2"
     currentPage = 0
     maxNextPageIterations = 3
+    user = ""
+    password = ""
 
     def __init__(self, name=None, jocs="", **kwargs):
         super().__init__(name, **kwargs)
         self.jocs = jocs.split(",")
+        with open('../../bsKrapy.json') as f:
+            data = json.load(f)
+            self.user = data['user']
+            self.password = data['password']
 
     def start_requests(self):
         return [Request(url=self.start_urls[0], callback=self.login)]
@@ -26,7 +33,7 @@ class BskmarketSpider(scrapy.Spider):
         inputs = response.xpath('//input')
         print(inputs[-2].attrib['name'], inputs[-2].attrib['value'])
         return scrapy.FormRequest('http://labsk.net/index.php?action=login2',
-                                  formdata={'user': 'xxxx@yahoo.com', 'passwrd': 'xxxx',
+                                  formdata={'user': self.user, 'passwrd': self.password,
                                             'cockielength': '120',
                                             inputs[-2].attrib['name']: inputs[-2].attrib['value'],
                                             inputs[-1].attrib['name']: inputs[-1].attrib['value']},
