@@ -1,0 +1,2 @@
+# bsKrapy
+scrapy project
